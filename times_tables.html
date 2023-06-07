@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        #answer, #submit {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Times Table Practice</h1>
+    <div id="setButtons"></div>
+    <div id="log"></div>
+    <div id="question"></div>
+    <input id="answer" type="number" min="0">
+    <button id="submit">Submit Answer</button>
+    <button id="restart" style="display: none;">Start Over</button>
+    <div id="score"></div>
+    <script>
+        var currentSet = 1, currentQuestion = 0, score = 0;
+        var happyEmojis = ['😀', '😃', '😄', '😁', '🎉', '🌈', '🦄', '🍭', '🌸', '🍬'];
+        var sadEmojis = ['😔', '😕', '🙁', '☹️', '😞', '😟', '😢', '😭', '💔', '🌧️'];
+
+        for (let i = 1; i <= 12; i++) {
+            let btn = document.createElement('button');
+            btn.textContent = i;
+            btn.onclick = () => {currentSet = i; document.getElementById('setButtons').style.display = 'none'; askQuestion();};
+            document.getElementById('setButtons').appendChild(btn);
+        }
+
+        document.getElementById('submit').onclick = () => {
+            checkAnswer();
+            if (currentQuestion < 10) askQuestion(); 
+            else endGame();
+        };
+
+        document.getElementById('restart').onclick = () => { location.reload(); };
+
+        function askQuestion() {
+            var number = Math.floor(Math.random() * 12) + 1;
+            currentQuestion++;
+            if (Math.random() < 0.5)
+                document.getElementById('question').textContent = currentSet + ' x ' + number + ' = ?';
+            else
+                document.getElementById('question').textContent = number + ' x ' + currentSet + ' = ?';
+            document.getElementById('answer').style.display = 'inline';
+            document.getElementById('submit').style.display = 'inline';
+            document.getElementById('answer').value = '';
+            document.getElementById('answer').focus();
+        }
+
+        function checkAnswer() {
+            var answer = document.getElementById('answer').value;
+            var questionParts = document.getElementById('question').textContent.split(' = ')[0].split(' x ');
+            var correctAnswer = parseInt(questionParts[0]) * parseInt(questionParts[1]);
+
+            var result = (parseInt(answer) === correctAnswer) ? 'Correct!' : 'Incorrect!';
+            var emoji = (parseInt(answer) === correctAnswer) ? happyEmojis[Math.floor(Math.random() * happyEmojis.length)] : sadEmojis[Math.floor(Math.random() * sadEmojis.length)];
+            document.getElementById('log').innerHTML += '<p>' + questionParts.join(' x ') + ' = ' + correctAnswer + '. Your answer: ' + answer + '. ' + result + ' ' + emoji + '</p>';
+            if (parseInt(answer) === correctAnswer) score++;
+        }
+
+        function endGame() {
+            document.getElementById('score').textContent = 'Score: ' + score + '/10';
+            document.getElementById('submit').style.display = 'none';
+            document.getElementById('answer').style.display = 'none';
+            document.getElementById('restart').style.display = 'inline';
+            document.getElementById('question').textContent = '';
+
+            if (score === 10) {
+                var emojiDiv = document.createElement('div');
+                emojiDiv.style.position = 'fixed';
+                emojiDiv.style.width = '100%';
+                emojiDiv.style.height = '100%';
+                emojiDiv.style.overflow = 'hidden';
+                emojiDiv.style.zIndex = '-1';
+                emojiDiv.style.whiteSpace = 'nowrap';
+                emojiDiv.style.fontSize = '2em';
+                emojiDiv.style.animation = 'scroll 5s linear infinite';
+
+                for (let i = 0; i < 100; i++) {
+                    emojiDiv.textContent += happyEmojis[Math.floor(Math.random() * happyEmojis.length)];
+                }
+
+                document.body.appendChild(emojiDiv);
+
+                document.body.style.animation = 'scroll 5s linear infinite';
+                document.body.style.background = 'white';
+            }
+        }
+    </script>
+</body>
+</html>
